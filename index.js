@@ -1,5 +1,8 @@
+//IMPORTING EXPRESS
 const express = require("express");
 const app = express();
+
+//PORT DECLARATION
 const PORT = 3000;
 
 //BODY PARSER
@@ -22,18 +25,38 @@ app.get("/", (req, res) => {
 app.get("/routes/jobs", (req, res) => {
   res.json(jobDetails);
 });
+app.get("/routes/jobs/:id", (req, res) => {
+  res.json(jobDetails[req.params.id]);
+});
 
 //POST
-app.post("/routes/jobs/", (req, res) => {
+app.post("/routes/jobs/:id", (req, res) => {
   res.send(`this is a post route`);
+  jobDetails.push(req.body[req.params.id]);
+  //console.log(`${JSON.stringify(req.body)}`);
+  res.json(jobDetails);
 });
 
 //DELETE
+app.delete("/routes/jobs/:id", (req, res) => {
+  jobDetails.splice(req.params.id, 1);
+  res.json(jobDetails);
+});
 
 //PUT
+app.put("/routes/jobs/:id", (req, res) => {
+  jobDetails[req.params.id] = req.params.id; //req.body;
+  res.json(jobDetails[req.params.id]);
+});
 
 //PATCH
-
+app.patch("/routes/jobs:/", (req, res) => {
+  console.log(jobDetails[req.params.id]);
+  console.log(req.body);
+  const newJobDetails = { ...jobDetails[req.params.id], ...req.body };
+  jobDetails[req.params.id] = newJobDetails;
+  res.json(jobDetails[req.params.id]);
+});
 // app.get("/routes/jobs/:", (req, res) => {
 //   res.send(`this is the jobs directory ${req.params.id}`);
 // });
