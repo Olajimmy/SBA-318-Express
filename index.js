@@ -21,8 +21,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ extended: true }));
 
 //IMPORTING ROUTES
-const jobDetails = require("./routes/jobDetails");
+const jobDetails = require("./routes/jobDetails"); //job details rout
 console.log(jobDetails);
+const users = require("./routes/users"); //users route
+console.log(users);
+const comment = require("./routes/comment"); //comment route
+console.log(comment);
 //IMPORTING DELETE VIEW
 
 //METHOD OVERRIDE TO ENABLE DELETE/UPDATE
@@ -30,13 +34,56 @@ const methodOverride = require("method-override");
 //USING METHOD OVERRIDE
 app.use(methodOverride("_method"));
 
+//=================middleware==================
+
+// Custom Middleware: Logs method, URL, and timestamp for each request
+const logRequestDetails = (req, res, next) => {
+  const method = req.method; // HTTP method (GET, POST, etc.)
+  const url = req.url; // Request URL
+  const timestamp = new Date().toISOString(); // Current timestamp
+  console.log(`[${timestamp}] ${method} request to ${url}`);
+  next(); // Pass control to the next middleware or route handler
+};
+
+// Use the custom middleware for all routes
+app.use(logRequestDetails);
+
+app.use((req, res, next) => {
+  console.log("runs through all the routes");
+  next();
+});
+
+//========================end middleware=====================
+
 //TESTING BASE PORT
 app.get("/", (req, res) => {
   res.send("this is the base port");
 });
 
 //=================================RENDER VIEW==================================================
-//NEWS.JSX***********************
+
+//USERS VIEW
+// app.get("/routes/users/:id", (req, res) => {
+//   res.send(users[req.params.id]);
+// });
+
+//ADDUSERS VIEW
+app.get("/users/addUser", (req, res) => {
+  res.render("users/addUser");
+});
+//*******************************END OF VIEWS********************** */
+
+//******************************POSTS******************************* */
+//add user post
+app.post("/routes/users", (req, res) => {
+  //   const name = req.body.userName;// CATCHING THE VALUE RETURNED FROM THE FORM IN THE USERNAME INPUT
+  //   const email = req.body.email;//CATCHING THE VALUE RETURNED FROM THE FORM IN THE EMAIL INPUT
+  users.push(req.body);
+  res.json(users);
+});
+
+//*******************************END POSTS********************************* */
+//JOBDETAILS NEWS.JSX***********************
 
 app.get("/jobDetails/News", (req, res) => {
   //the fruits/new in the render needs to be pointing to     something in my views folder
@@ -75,6 +122,29 @@ app.get("/jobDetails/Edits/:id", (req, res) => {
     res.status(404).send("Job not found");
   }
 });
+
+//EDITUSER .JSX
+app.get("/users/editUser", (req, res) => {
+  res.render("users/editUser");
+});
+
+//try in chatGPT
+//EDIT USER POST
+app.get("/routes/users", (req, res) => {
+  //const id = req.body;
+  //   const indexValue = users[id];
+  //   const name = req.body.userName;
+  //   const email = req.body.email;
+  //   users.id = id;
+  //   users.username = name;
+  //   users.email = email;
+  res.render("users/editUser", {
+    title: job.title,
+    description: job.description,
+    id: req.body, // Pass the job ID as well
+  });
+});
+//req.json(users);
 
 // app.get("/jobDetails/Edits", (req, res) => {
 //   res.render(
@@ -170,22 +240,46 @@ app.put("/routes/jobDetails/:id", (req, res) => {
 //   jobDetails.splice(req.params.id, 1);
 //   res.json(jobDetails);
 // });
-app.delete("/routes/jobDetails/Delete", (req, res) => {
-  jobDetails.splice(1);
-  res.json(jobDetails);
+// app.get("/jobDetails/Delete", (req, res) => {
+//   res.render("jobDetails/Delete");
+// });
+
+app.get("/jobDetails/Delete", (req, res) => {
+  res.render("jobDetails/Delete"); // Render the delete form
 });
 
-//PATCH
-app.patch("/routes/jobs:/", (req, res) => {
-  console.log(jobDetails[req.params.id]);
-  console.log(req.body);
-  const newJobDetails = { ...jobDetails[req.params.id], ...req.body };
-  jobDetails[req.params.id] = newJobDetails;
-  res.json(jobDetails[req.params.id]);
+app.delete("/routes/jobDetails/:id", (req, res) => {
+  const jobId2 = req.params.id; // Get the job ID from the URL parameter
+
+  if (jobDetails[jobId2]) {
+    // Delete the job from the array
+    jobDetails.splice(jobId2, 1); // Splice removes 1 job at the specified index
+
+    res.json({
+      message: `Job with ID ${jobId2} deleted successfully.`,
+      remainingJobs: jobDetails, // Return the updated job list
+    });
+  } else {
+    res.status(404).send(`Job with ID ${jobId2} not found.`);
+  }
 });
+
+// app.delete("/routes/jobDetails", (req, res) => {
+//   jobDetails.splice(1);
+//   res.json(jobDetails);
+// });
+
 // app.get("/routes/jobs/:", (req, res) => {
 //   res.send(`this is the jobs directory ${req.params.id}`);
 // });
+
+app.use((req, res) => {
+  console.log(
+    `i am only in this middleware if no other routes have sent a response`
+  );
+  res.status(404);
+  res.json({ error: `resource not found` });
+});
 
 // Shhh........ Local Host is listening.
 app.listen(PORT, () => {
