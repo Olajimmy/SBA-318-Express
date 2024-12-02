@@ -21,19 +21,22 @@ const React = require("react");
 class Delete extends React.Component {
   render() {
     return (
-      <form
-        action={`/routes/jobDetails/${this.props.id}?_method=DELETE`} // Use DELETE method with job ID
-        method="POST"
-      >
-        <label>Enter Index to Delete:</label>
-        <input
-          type="text"
-          name="id"
-          value={this.props.id} // Set the value of the ID (from props)
-        />
-        <br />
-        <input type="submit" value="Delete" />
-      </form>
+      <div style={{ backgroundColor: "#6d9bc3" }}>
+        <h1>Delete Page</h1>
+        <form
+          action={`/routes/jobDetails/${this.props.id}?_method=DELETE`} // Use DELETE method with job ID
+          method="POST"
+        >
+          <label>Enter Index to Delete:</label>
+          <input
+            type="text"
+            name="id"
+            value={this.props.id} // Set the value of the ID (from props)
+          />
+          <br />
+          <input type="submit" value="Delete" />
+        </form>
+      </div>
     );
   }
 }

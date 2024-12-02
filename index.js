@@ -128,21 +128,41 @@ app.get("/users/editUser", (req, res) => {
   res.render("users/editUser");
 });
 
-//try in chatGPT
+//NOT ENOUGH TIME
+// THE ISSUE IS THAT I WANTED TO BE ABLE TO TYPE
+//IN THE INDEX NUMBER FROM THE TEXTBOX TO UPDATE THE
+//USERS INFORMATION INSTEAD OF GOIN THROUGH THE URL BAR
 //EDIT USER POST
-app.get("/routes/users", (req, res) => {
-  //const id = req.body;
-  //   const indexValue = users[id];
-  //   const name = req.body.userName;
-  //   const email = req.body.email;
-  //   users.id = id;
-  //   users.username = name;
-  //   users.email = email;
-  res.render("users/editUser", {
-    title: job.title,
-    description: job.description,
-    id: req.body, // Pass the job ID as well
-  });
+app.put("/routes/users/:id", (req, res) => {
+  const jobId2 = req.body.id; // Get the job ID from the URL parameter
+  const updatedUser = req.body;
+  if (users[jobId2]) {
+    // Update the job details in the jobDetails array or object
+    users[jobId2] = { ...users[jobId2], ...updatedUser };
+
+    // Send a response back with the updated job
+    res.json({
+      message: `Job ${jobId2} updated successfully`,
+      updatedUser: users[jobId2],
+    });
+  } else {
+    // If the job ID doesn't exist, return a 404 error
+    res.status(404).send(`Job with ID ${jobId2} not found.`);
+  }
+  //   if (users[jobId2]) {
+  //     // Delete the job from the array
+  //     users[jobId2][req.body];
+  //     users[1][req.body];
+
+  //     //jobDetails.splice(jobId2, 1); // Splice removes 1 job at the specified index
+
+  //     res.json({
+  //       message: `Job with ID ${jobId2} Updated successfully.`,
+  //       remainingJobs: jobDetails, // Return the updated job list
+  //     });
+  //   } else {
+  //     res.status(404).send(`Job with ID ${jobId2} not found.`);
+  //   }
 });
 //req.json(users);
 
@@ -249,7 +269,7 @@ app.get("/jobDetails/Delete", (req, res) => {
 });
 
 app.delete("/routes/jobDetails/:id", (req, res) => {
-  const jobId2 = req.params.id; // Get the job ID from the URL parameter
+  const jobId2 = req.body.id; // Get the job ID from the URL parameter
 
   if (jobDetails[jobId2]) {
     // Delete the job from the array
